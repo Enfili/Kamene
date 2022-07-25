@@ -2,17 +2,28 @@ package times;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Formatter;
+import java.util.List;
 
-public class TestClass implements Serializable {
-    ArrayList<PlayerTime> pt = new ArrayList<>();
+public class BestTimes implements Serializable {
+    private static final long serialVersionUID = 1L;
+    List<PlayerTime> playerTimes = new ArrayList<>();
 
-    public TestClass() {
-        pt.add(new PlayerTime("a", 2));
-        pt.add(new PlayerTime("s", 3));
+    public BestTimes() {
+        playerTimes = loadTimes();
+    }
+
+    public void addPlayer(String name, int time) {
+        playerTimes.add(new PlayerTime(name, time));
+        Collections.sort(playerTimes);
+    }
+
+    public void savePlayingTimes() {
         ObjectOutputStream oos = null;
         try {
-            oos = new ObjectOutputStream(new FileOutputStream(new File("test.txt")));
-            oos.writeObject(pt);
+            oos = new ObjectOutputStream(new FileOutputStream(new File("times.txt")));
+            oos.writeObject(playerTimes);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -26,13 +37,12 @@ public class TestClass implements Serializable {
         }
     }
 
-    public void readTest() {
+    public List<PlayerTime> loadTimes() {
         ObjectInputStream ois = null;
         try {
-            ois = new ObjectInputStream(new FileInputStream("test.txt"));
-            ArrayList<PlayerTime> pp = (ArrayList<PlayerTime>) ois.readObject();
-            for (PlayerTime p: pp)
-                System.out.println(p.name + " " + p.time);
+            ois = new ObjectInputStream(new FileInputStream("times.txt"));
+            playerTimes = (List<PlayerTime>) ois.readObject();
+            return playerTimes;
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {
@@ -46,6 +56,14 @@ public class TestClass implements Serializable {
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        Formatter f = new Formatter();
+        for (PlayerTime p: playerTimes)
+            f.format("%s, playing time: %d%n", p.name, p.time);
+        return f.toString();
     }
 
     private class PlayerTime implements Comparable<PlayerTime>, Serializable {

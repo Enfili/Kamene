@@ -3,6 +3,7 @@ package core;
 import java.io.Serializable;
 
 public class Field implements Serializable {
+    private static final long serialVersionUID = 2L;
     private final int rowCount;
     private final int columnCount;
     private final Stone[][] stones;
